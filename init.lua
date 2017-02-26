@@ -26,5 +26,5 @@ else
   --dofile("httpTrigger.lua")
   print("ESP_CC1101 Tx Test")
   dofile("ESP_CC1101_association.lua")
-  dofile("CC1101TXtest.lua")
+  dofile("CC1101c.lua")
 end

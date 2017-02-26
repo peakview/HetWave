@@ -43,19 +43,24 @@ return readbyte,CCstatus
 end
 
 -- Read CC1101 Reg Burst
-function CCreadMulti(Addr,Len)
+function CCreadMulti(Addr,Len,Verbose)
+  Verbose=Verbose or 0
   gpio.write(pin, gpio.LOW)
   local Ntx,CCstatus=spi.send(SPI_ID,bit.bor(0xC0,Addr))
   local read = 1
   local readbyte = 1
+  local reads=""
   for ii=1,Len do
     read = spi.recv(SPI_ID, 1)
     readbyte = string.byte(read)
-  print("CCread Reg[0x" .. string.format("%02X",Addr) .. "]=0x" .. string.format("%02X",readbyte) .. "," .. string.format("%c",readbyte) .. ", CCstatus num=" .. string.format("%02X",CCstatus))
+    reads=reads .. read
+    if Verbose==0 then
+      print("CCread Reg[0x" .. string.format("%02X",Addr) .. "]=0x" .. string.format("%02X",readbyte) .. "," .. string.format("%c",readbyte) .. ", CCstatus num=" .. string.format("%02X",CCstatus))
+    end
   end
   gpio.write(pin, gpio.HIGH)
   tmr.delay(20)
-return readbyte,CCstatus
+return reads,CCstatus
 end
 
 --set CCaddress as CC1101 MAC address, set BroadcastMode as 
