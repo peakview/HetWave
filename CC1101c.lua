@@ -34,7 +34,8 @@ function CCfetchRX()
 --CC1101_Get_RxCounter( )
 local RX_Buffer_Status=CCread(0x3B)
 local RX_byte_num = bit.band(RX_Buffer_Status,0x7F)
-print("RX_byte_num = " .. RX_byte_num)
+print("RX -- byte_num = " .. RX_byte_num)
+print("RX -- RSSI = " .. string.format("%02X",CCread(0x34)))
 if RX_byte_num>0 then
   local RxPktLen=CCread(0x3F)
   if bit.band(CCread(0x07),0x03) ~= 0 then --CC1101_PKTCTRL1
@@ -42,7 +43,7 @@ if RX_byte_num>0 then
   end
   RxPktLen=RxPktLen-1
 
-  local reads=CCreadMulti(0x3F,RX_byte_num,1)
+  local reads=CCreadMulti(0x3F,RxPktLen,1)
   print(reads)
   CCenterRX()
   return reads
