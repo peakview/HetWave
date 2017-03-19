@@ -45,6 +45,39 @@ function SXxmit(Datas)
   SX1276_Set_TXRX_Mode(RegOpMode_TXRX.TX)
 end
 
+function SXrecv()
+  local RF_EX0_STATUS = SXread(0x12) --REG_LR_IRQFLAGS
+  local RegModemConfig2 = SXread(0x1E) --REG_LR_MODEMCONFIG2
+  if bit.band(RegModemConfig2,0x04) == 0x04 then --CRC_Value
+    SXwrite(0x0D, 0x00) --REG_LR_FIFOADDRPTR
+    local SX1278_RLEN = SXread(0x13) --REG_LR_NBRXBYTES
+
+    reads=SXreadMulti(0x00,SX1278_RLEN)
+    --lpTypefunc.lpSwitchEnStatus(enOpen);
+    --lpTypefunc.lpByteWritefunc(0x00);
+    --for (RF_REC_RLEN_i = 0; RF_REC_RLEN_i < SX1278_RLEN;
+    --  RF_REC_RLEN_i++) {
+    --    recv[RF_REC_RLEN_i] = lpTypefunc.lpByteReadfunc();
+    --  }
+    --lpTypefunc.lpSwitchEnStatus(enClose);
+                        
+    reads = reads .. '\0' --print("abs" .. '\0' .. "ab")
+    
+    --P17 = 0;
+  else
+    reads = "empty"
+  end
+  
+  SX1276_Set_TXRX_Mode(RegOpMode_TXRX.STDBY)
+  SXwrite(0x11,0x9F) --(REG_LR_IRQFLAGSMASK, IRQN_RXD_Value)
+  SXwrite(0x24,0xFF) --(REG_LR_HOPPERIOD, PACKET_MIAX_Value)
+  SXwrite(0x40,0x00) --REG_LR_DIOMAPPING1
+  SXwrite(0x41,0x00) --REG_LR_DIOMAPPING2
+  SX1276_Set_TXRX_Mode(RegOpMode_TXRX.RXC)
+
+  SXwrite(0x12, 0xff) --REG_LR_IRQFLAGS
+  return reads
+end
 
 --print(bit.rshift(0x3FF , 8))
 function SX1276_LoRa_Init()
@@ -97,18 +130,5 @@ function SX_MCU_init()
   print('SX_MCU_init(): (if ==0 fails)' .. status)
 end
 
-SX_MCU_init()
-SX1276_LoRa_Init()
 
---function CCTxTest()
-if 1==0 then
-SXTxTimer = tmr.create()
-iiTx=1
--- oo calling
-SXTxTimer:register(3000, tmr.ALARM_AUTO, 
-function (t) SXxmit("Its brightest stars are Rigel Beta Orionis + Betel-" .. iiTx .."\n"); iiTx=iiTx+1;  end)
-SXTxTimer:start()
 
---SXTxTimer:unregister()
-end
---

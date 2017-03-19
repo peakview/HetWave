@@ -44,14 +44,14 @@ end
 
 -- Read SX1278 Reg
 function SXread(Addr,Verbose)
-  Verbose=Verbose or 1
+  Verbose=Verbose or 0
   gpio.write(pin, gpio.LOW)
   --local Ntx,CCstatus=spi.send(SPI_ID,bit.bor(0x80,Addr))
   local Ntx,CCstatus=spi.send(SPI_ID,Addr)
   local read = spi.recv(SPI_ID, 1)
   local readbyte = string.byte(read)
   if Verbose==1 then
-    print("CCread Reg[0x" .. string.format("%02X",Addr) .. "]=0x" .. string.format("%02X",readbyte) .. ", CCstatus num=" .. string.format("%02X",CCstatus))
+    print("SXread Reg[0x" .. string.format("%02X",Addr) .. "]=0x" .. string.format("%02X",readbyte) .. ", CCstatus num=" .. string.format("%02X",CCstatus))
   end
   gpio.write(pin, gpio.HIGH)
   --tmr.delay(20)
@@ -70,8 +70,8 @@ function SXreadMulti(Addr,Len,Verbose)
     read = spi.recv(SPI_ID, 1)
     readbyte = string.byte(read)
     reads=reads .. read
-    if Verbose==0 then
-      print("CCread Reg[0x" .. string.format("%02X",Addr) .. "]=0x" .. string.format("%02X",readbyte) .. "," .. string.format("%c",readbyte) .. ", CCstatus num=" .. string.format("%02X",CCstatus))
+    if Verbose==1 then
+      print("SXread Reg[0x" .. string.format("%02X",Addr) .. "]=0x" .. string.format("%02X",readbyte) .. "," .. string.format("%c",readbyte) .. ", CCstatus num=" .. string.format("%02X",CCstatus))
     end
   end
   gpio.write(pin, gpio.HIGH)
