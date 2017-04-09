@@ -58,17 +58,12 @@ function MPUreadMulti(Addr,Len,Verbose)
 return reads,CCstatus
 end
 
-  spi.setup(SPI_ID,spi.MASTER,spi.CPOL_LOW,spi.CPHA_LOW,spi.DATABITS_8,128,spi.FULLDUPLEX)
-  gpio.mode(pinNCS, gpio.OUTPUT)
-
---Check SPI interface read 
-MPUread(0x75,1)
-MPUread(0x6B,1)
-MPUread(0x6C,1)
 
 function MPUinit()
 PWR_MGMT_1=0x6B
 MPUwrite(PWR_MGMT_1,0x80) --Reset Device
+tmr.delay(1000)
+MPUwrite(0x6A,0x02) --MPUREG_USER_CTRL:I2C_MST_RST
 --Single_Write(GYRO_ADDRESS,PWR_MGMT_1, 0x00);    //解除休眠状态
 MPUwrite(PWR_MGMT_1,0x01) --Clock Source
 --Single_Write(GYRO_ADDRESS,SMPLRT_DIV, 0x07);
@@ -83,6 +78,7 @@ MPUwrite(GYRO_CONFIG,0x18)
 --Single_Write(GYRO_ADDRESS,ACCEL_CONFIG, 0x01);
 ACCEL_CONFIG=0x1C
 MPUwrite(ACCEL_CONFIG,0x01)
+
 
 MPUwrite(0x6A,0x20) --MPUREG_USER_CTRL
 MPUwrite(0x24,0x0D) --MPUREG_I2C_MST_CTRL
@@ -109,6 +105,16 @@ MPUread(0x49,1)
 MPUread(0x27,1) 
 end
 
+
+
+  spi.setup(SPI_ID,spi.MASTER,spi.CPOL_LOW,spi.CPHA_LOW,spi.DATABITS_8,128,spi.FULLDUPLEX)
+  gpio.mode(pinNCS, gpio.OUTPUT)
+
+--Check SPI interface read 
+MPUread(0x75,1)
+MPUread(0x6B,1)
+MPUread(0x6C,1)
+MPUinit()
 for ii=1,20 do
 ACCEL_XOUT_H=MPUread(0x3B,0)
 ACCEL_XOUT_L=MPUread(0x3C,0)
