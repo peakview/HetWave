@@ -101,8 +101,10 @@ MPUwrite(0x27,0x81)
 MPUwrite(0x25,0x8C)
 MPUwrite(0x26,0x00) --AK8963_WIA
 MPUwrite(0x27,0x81)
-MPUread(0x49,1) 
-MPUread(0x27,1) 
+WIA = MPUread(0x49,1)
+if WIA ~=0x48 then
+print("MPUInit Error:" .. string.format("%02X",WIA))
+end
 end
 
 
@@ -111,7 +113,10 @@ end
   gpio.mode(pinNCS, gpio.OUTPUT)
 
 --Check SPI interface read 
-MPUread(0x75,1)
+WIA = MPUread(0x75,1)
+if WIA~=0x71 then
+print("MPU9250 init error:" string.format("%02X",WIA))
+end
 MPUread(0x6B,1)
 MPUread(0x6C,1)
 MPUinit()
